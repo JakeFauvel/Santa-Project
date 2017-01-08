@@ -16,14 +16,21 @@ var SCREEN_HEIGHT = 600;
 
 var BACKGROUND_X = 0;
 var BACKGROUND_Y = 0;
-var START_BTN_X = 400;
-var START_BTN_Y = 300;
+var START_BTN_X = 312.5;
+var START_BTN_Y = 275;
 
 var ROOFTOP_SPAWN_POSITION = 1035;
 var ROOFTOP_VELOCITY_X = 150;
 var ROOFTOP_SPAWN_TIMER = 3100;
 var ROOFTOP_SPAWN_HEIGHT_BASE = 690;
 var ROOFTOP_SPAWN_HEIGHT_VARIATION = -100;
+
+var max = 0;
+var front_emitter;
+var mid_emitter;
+var back_emitter;
+var update_interval = 4 * 60;
+var i = 0;
 
 var game = new Phaser.Game(SCREEN_WIDTH, SCREEN_HEIGHT, Phaser.AUTO, 'phaser-example', { preload: preload, create: create, update: update });
 
@@ -35,6 +42,8 @@ function preload() {
   game.load.image('background', 'resources/img/Background.png');
   game.load.image('startButton', 'resources/img/Start_Button.png');
   game.load.image('rooftop', 'resources/img/Winter_Roof.png');
+  game.load.image('snowflakes', 'resources/img/Snowflake.png');
+  game.load.image('snowflakes_large', 'resources/img/Snowflake.png');
 
   Chimney.preload(game);
   Santa.preload(game);
@@ -52,6 +61,46 @@ function create() {
   startButton = game.add.button(START_BTN_X, START_BTN_Y, 'startButton', startNewGame, interfaceLayer);
 
   game.physics.startSystem(Phaser.Physics.P2JS);
+
+  back_emitter = game.add.emitter(game.world.centerX + 325, -32, 1000);
+  back_emitter.makeParticles('snowflakes', [0, 1, 2, 3, 4, 5]);
+  back_emitter.maxParticleScale = 0.2;
+  back_emitter.minParticleScale = 0.05;
+  back_emitter.setYSpeed(70, 100);
+  back_emitter.setXSpeed(-120, -120);
+  back_emitter.gravity = 0;
+  back_emitter.width = game.world.width * 1.5;
+  back_emitter.minRotation = 0;
+  back_emitter.maxRotation = 40;
+  back_emitter.lifeSpan = 4500;
+
+  mid_emitter = game.add.emitter(game.world.centerX + 325, -32, 500);
+  mid_emitter.makeParticles('snowflakes', [0, 1, 2, 3, 4, 5]);
+  mid_emitter.maxParticleScale = 0.3;
+  mid_emitter.minParticleScale = 0.1;
+  mid_emitter.setYSpeed(100, 150);
+  mid_emitter.setXSpeed(-120, -120);
+  mid_emitter.gravity = 0;
+  mid_emitter.width = game.world.width * 1.5;
+  mid_emitter.minRotation = 0;
+  mid_emitter.maxRotation = 40;
+  mid_emitter.lifeSpan = 4500;
+
+  front_emitter = game.add.emitter(game.world.centerX + 325, -32, 500);
+  front_emitter.makeParticles('snowflakes_large', [0, 1, 2, 3, 4, 5]);
+  front_emitter.maxParticleScale = 0.45;
+  front_emitter.minParticleScale = 0.25;
+  front_emitter.setYSpeed(150, 200);
+  front_emitter.setXSpeed(-120, -120);
+  front_emitter.gravity = 0;
+  front_emitter.width = game.world.width * 1.5;
+  front_emitter.minRotation = 0;
+  front_emitter.maxRotation = 40;
+  front_emitter.lifeSpan = 4500;
+
+  back_emitter.start(false, 14000, 10);
+  mid_emitter.start(false, 12000, 20);
+  front_emitter.start(false, 6000, 500);
 
   santaCollionGroup = game.physics.p2.createCollisionGroup();
   chimneyCollisionGroup = game.physics.p2.createCollisionGroup();
@@ -94,6 +143,7 @@ function update() {
   }
   Chimney.update();
   Santa.update(game);
+
 };
 
 function reset() {
