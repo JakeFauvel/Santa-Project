@@ -31,19 +31,20 @@ var mid_emitter;
 var back_emitter;
 var update_interval = 4 * 60;
 var i = 0;
+var scoreText = undefined;
+
+var POINTS = 0;
 
 var game = new Phaser.Game(SCREEN_WIDTH, SCREEN_HEIGHT, Phaser.AUTO, 'phaser-example', { preload: preload, create: create, update: update });
 
 function preload() {
-  // You can fill the preloader with as many assets as your game requires
-  // Here we are loading an image. The first parameter is the unique
-  // String by which we'll identify the image later in our code.
-  // The second parameter is the URL of the image (relative)
+
   game.load.image('background', 'resources/img/Background.png');
   game.load.image('startButton', 'resources/img/Start_Button.png');
   game.load.image('rooftop', 'resources/img/Winter_Roof.png');
   game.load.image('snowflakes', 'resources/img/Snowflake.png');
   game.load.image('snowflakes_large', 'resources/img/Snowflake.png');
+  game.load.image('fire', 'resources/img/Fire.png');
 
   Chimney.preload(game);
   Santa.preload(game);
@@ -56,13 +57,27 @@ function create() {
   rooftopLayer = game.add.group();
   var santaLayer = game.add.group();
   var interfaceLayer = game.add.group();
+  var textStyle = { font: "20px Arial", fill: "#FFF"};
+  scoreText = this.game.add.text(25, 20, "Score:" + POINTS, textStyle);
+  scoreText.fixedToCamera = true;
+
+  // CREATE MESSAGE TEXT AND HIDE IT
 
   backgroundLayer.create(BACKGROUND_X, BACKGROUND_Y, 'background');
   startButton = game.add.button(START_BTN_X, START_BTN_Y, 'startButton', startNewGame, interfaceLayer);
 
   game.physics.startSystem(Phaser.Physics.P2JS);
 
-  back_emitter = game.add.emitter(game.world.centerX + 325, -32, 1000);
+  jetpack_emitter = game.add.emitter(0, 0, 10);
+  jetpack_emitter.makeParticles('fire');
+  jetpack_emitter.setAlpha(1, 0, 300);
+  jetpack_emitter.setRotation(0, 0);
+  jetpack_emitter.setYSpeed(20, 50);
+  jetpack_emitter.setXSpeed(-25, 50);
+  game.input.onDown.add(particleBurst, this);
+  jetpack_emitter.on = false;
+
+  back_emitter = game.add.emitter(game.world.centerX + 350, -32, 1000);
   back_emitter.makeParticles('snowflakes', [0, 1, 2, 3, 4, 5]);
   back_emitter.maxParticleScale = 0.2;
   back_emitter.minParticleScale = 0.05;
@@ -74,8 +89,8 @@ function create() {
   back_emitter.maxRotation = 40;
   back_emitter.lifeSpan = 4500;
 
-  mid_emitter = game.add.emitter(game.world.centerX + 325, -32, 500);
-  mid_emitter.makeParticles('snowflakes', [0, 1, 2, 3, 4, 5]);
+  mid_emitter = game.add.emitter(game.world.centerX + 350, -32, 500);
+  mid_emitter.makeParticles('snowflakes_large', [0, 1, 2, 3, 4, 5]);
   mid_emitter.maxParticleScale = 0.3;
   mid_emitter.minParticleScale = 0.1;
   mid_emitter.setYSpeed(100, 150);
@@ -86,7 +101,7 @@ function create() {
   mid_emitter.maxRotation = 40;
   mid_emitter.lifeSpan = 4500;
 
-  front_emitter = game.add.emitter(game.world.centerX + 325, -32, 500);
+  front_emitter = game.add.emitter(game.world.centerX + 350, -32, 500);
   front_emitter.makeParticles('snowflakes_large', [0, 1, 2, 3, 4, 5]);
   front_emitter.maxParticleScale = 0.45;
   front_emitter.minParticleScale = 0.25;
@@ -141,6 +156,12 @@ function update() {
     rooftop.body.setZeroVelocity();
     rooftop.body.moveLeft(ROOFTOP_VELOCITY_X);
   }
+  
+  if (!GameState.getStopped()) {
+    POINTS = POINTS + 1;
+    scoreText.text = "Score: " + POINTS;
+  }
+
   Chimney.update();
   Santa.update(game);
 
@@ -159,6 +180,7 @@ function reset() {
   Santa.reset();
   Chimney.reset();
   startButton.visible = true;
+  // SHOW MESSAGE TEXT IF SCORE > 0 (i.e if this is after a death)
 };
 
 function startNewGame() {
@@ -166,4 +188,22 @@ function startNewGame() {
   GameState.setStopped(false);
   Santa.show();
   startButton.visible = false;
+  // HIDE MESSAGE TEXT 
+  POINTS = 0;
 };
+
+function particleBurst(pointer) {
+
+  //  Position the emitter where the mouse/touch event was
+  jetpack_emitter.x = Santa.getSantaX() - 35 ;
+  jetpack_emitter.y = Santa.getSantaY() + 25;
+
+  //  The first parameter sets the effect to "explode" which means all particles are emitted at once
+  //  The second gives each particle a 2000ms lifespan
+  //  The third is ignored when using burst/explode mode
+  //  The final parameter (10) is how many particles will be emitted in this single burst
+  if (!GameState.getStopped()) {
+      jetpack_emitter.start(true, 350, null, 5);
+  }
+
+}

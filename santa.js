@@ -65,6 +65,14 @@ function reset() {
   game.input.onDown.remove(thrust, this);
 };
 
+function getSantaX() {
+  return santa.body.x;
+};
+
+function getSantaY() {
+  return santa.body.y;
+};
+
 function show() {
     santa.visible = true;
     game.input.onDown.add(thrust, this);  
@@ -79,5 +87,7 @@ module.exports = {
   create: create,
   update: update,
   reset: reset,
+  getSantaX: getSantaX,
+  getSantaY: getSantaY,
   show: show
 };
