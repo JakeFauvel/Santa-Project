@@ -24,6 +24,10 @@ var START_BTN_Y = 400;
 var SOUND_BTN_X = 740;
 var SOUND_BTN_Y = 25;
 var backgroundMusic = undefined;
+var t1 = undefined;
+var t2 = undefined;
+var t3 = undefined;
+var thrustArray = [];
 
 var ROOFTOP_SPAWN_POSITION = 1035;
 var ROOFTOP_VELOCITY_X = 150;
@@ -51,6 +55,9 @@ function preload() {
   game.load.image('sound_icon', 'resources/img/Sound_Icon.png');
 
   game.load.audio('bells', 'resources/sound/Sleigh_Bells.mp3');
+  game.load.audio('thrust1', 'resources/sound/Thrust1.wav');
+  game.load.audio('thrust2', 'resources/sound/Thrust2.wav');
+  game.load.audio('thrust3', 'resources/sound/Thrust3.wav');
 
   Chimney.preload(game);
   Santa.preload(game);
@@ -67,8 +74,8 @@ function create() {
   var christmasMessagestyle = { font: "70px Arial", fill: "#FFF"};
   scoreText = this.game.add.text(25, 20, "SCORE: " + SCORE, textStyle);
   scoreText.fixedToCamera = true;
-  christmasText = this.game.add.text(50, 225, "MERRY CHRISTMAS!", christmasMessagestyle);
-  christmasText.fixedToCamera = true;
+  christmasMessage = this.game.add.text(50, 225, "MERRY CHRISTMAS!", christmasMessagestyle);
+  christmasMessage.fixedToCamera = true;
 
   // CREATE MESSAGE TEXT AND HIDE IT
 
@@ -81,6 +88,16 @@ function create() {
   backgroundMusic.play();
   var soundButton = game.add.button(SOUND_BTN_X, SOUND_BTN_Y, 'sound_icon', audioButton);
 
+  t1 = game.add.audio('thrust1');
+  t2 = game.add.audio('thrust2');
+  t3 = game.add.audio('thrust3');
+  t1.volume = 1;
+  t2.volume = 1;
+  t3.volume = 0.5;
+  thrustArray.push(t1);
+  thrustArray.push(t2);
+  thrustArray.push(t3);
+
   game.physics.startSystem(Phaser.Physics.P2JS);
 
   jetpack_emitter = game.add.emitter(0, 0, 10);
@@ -88,8 +105,8 @@ function create() {
   jetpack_emitter.setAlpha(1, 0, 300);
   jetpack_emitter.setRotation(0, 0);
   jetpack_emitter.setYSpeed(20, 50);
-  jetpack_emitter.setXSpeed(-25, 50);
-  game.input.onDown.add(particleBurst, this);
+  jetpack_emitter.setXSpeed(-90, -40);
+  game.input.onDown.add(santaEffects, this);
   jetpack_emitter.on = false;
 
   back_emitter = game.add.emitter(game.world.centerX + 350, -32, 1000);
@@ -195,28 +212,32 @@ function reset() {
   Santa.reset();
   Chimney.reset();
   startButton.visible = true;
-  // SHOW MESSAGE TEXT IF SCORE > 0 (i.e if this is after a death)
+  
+  if (SCORE > 0 ) {
+    christmasMessage.visible = true;
+  } else {
+    christmasMessage.visible = false;
+  }
 };
 
 function startNewGame() {
   game.physics.p2.resume();
   GameState.setStopped(false);
   Santa.show();
+  christmasMessage.visible = false;
   startButton.visible = false;
-  // HIDE MESSAGE TEXT 
   SCORE = 0;
 };
 
 function audioButton() {
   if (backgroundMusic.volume === 0.1) {
     backgroundMusic.volume = 0.0;
-  }
-  else if (backgroundMusic.volume === 0.0) {
+  } else if (backgroundMusic.volume === 0.0) {
     backgroundMusic.volume = 0.1;
   }
 };
 
-function particleBurst(pointer) {
+function santaEffects(pointer) {
 
   //  Position the emitter at Santa's butt
   jetpack_emitter.x = Santa.getSantaX() - 35 ;
@@ -228,6 +249,8 @@ function particleBurst(pointer) {
   //  The final parameter (10) is how many particles will be emitted in this single burst
   if (!GameState.getStopped()) {
       jetpack_emitter.start(true, 350, null, 5);
+      var randomArrayIndex = Math.floor(Math.random() * thrustArray.length);
+      thrustArray[randomArrayIndex].play();
   }
 
 }
