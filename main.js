@@ -18,6 +18,9 @@ var BACKGROUND_X = 0;
 var BACKGROUND_Y = 0;
 var START_BTN_X = 312.5;
 var START_BTN_Y = 275;
+var SOUND_BTN_X = 740;
+var SOUND_BTN_Y = 25;
+var backgroundMusic = undefined;
 
 var ROOFTOP_SPAWN_POSITION = 1035;
 var ROOFTOP_VELOCITY_X = 150;
@@ -33,7 +36,7 @@ var update_interval = 4 * 60;
 var i = 0;
 var scoreText = undefined;
 
-var POINTS = 0;
+var SCORE = 0;
 
 var game = new Phaser.Game(SCREEN_WIDTH, SCREEN_HEIGHT, Phaser.AUTO, 'phaser-example', { preload: preload, create: create, update: update });
 
@@ -45,6 +48,9 @@ function preload() {
   game.load.image('snowflakes', 'resources/img/Snowflake.png');
   game.load.image('snowflakes_large', 'resources/img/Snowflake.png');
   game.load.image('fire', 'resources/img/Fire.png');
+  game.load.image('sound_icon', 'resources/img/Sound_Icon.png');
+
+  game.load.audio('bells', 'resources/sound/Sleigh_Bells.mp3');
 
   Chimney.preload(game);
   Santa.preload(game);
@@ -58,13 +64,19 @@ function create() {
   var santaLayer = game.add.group();
   var interfaceLayer = game.add.group();
   var textStyle = { font: "20px Arial", fill: "#FFF"};
-  scoreText = this.game.add.text(25, 20, "Score:" + POINTS, textStyle);
+  scoreText = this.game.add.text(25, 20, "Score:" + SCORE, textStyle);
   scoreText.fixedToCamera = true;
 
   // CREATE MESSAGE TEXT AND HIDE IT
 
   backgroundLayer.create(BACKGROUND_X, BACKGROUND_Y, 'background');
   startButton = game.add.button(START_BTN_X, START_BTN_Y, 'startButton', startNewGame, interfaceLayer);
+
+  backgroundMusic = game.add.audio('bells');
+  backgroundMusic.loop = true;  
+  backgroundMusic.volume = 0.1;
+  backgroundMusic.play();
+  var soundButton = game.add.button(SOUND_BTN_X, SOUND_BTN_Y, 'sound_icon', audioButton);
 
   game.physics.startSystem(Phaser.Physics.P2JS);
 
@@ -158,8 +170,8 @@ function update() {
   }
   
   if (!GameState.getStopped()) {
-    POINTS = POINTS + 1;
-    scoreText.text = "Score: " + POINTS;
+    SCORE = SCORE + 1;
+    scoreText.text = "Score: " + SCORE;
   }
 
   Chimney.update();
@@ -189,7 +201,16 @@ function startNewGame() {
   Santa.show();
   startButton.visible = false;
   // HIDE MESSAGE TEXT 
-  POINTS = 0;
+  SCORE = 0;
+};
+
+function audioButton() {
+  if (backgroundMusic.volume === 0.1) {
+    backgroundMusic.volume = 0.0;
+  }
+  else if (backgroundMusic.volume === 0.0) {
+    backgroundMusic.volume = 0.1;
+  }
 };
 
 function particleBurst(pointer) {

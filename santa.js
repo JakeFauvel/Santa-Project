@@ -2,7 +2,7 @@ var SANTA_SPAWN_X = 400;
 var SANTA_SPAWN_Y = 200;
 var DEFAULT_GRAVITY_AMOUNT = 2000;
 var GRAVITY_INCREASE = 0;
-var SANTA_VELOCITY_Y = -800;
+var SANTA_VELOCITY_Y = -650;
 
 var game = undefined;
 var santaCollionGroup = undefined;
