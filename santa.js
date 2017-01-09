@@ -14,7 +14,7 @@ var contactCallback = undefined;
 
 var preload = function(inputGame) {
   game = inputGame;
-  game.load.image('santa', 'resources/img/Santa.png');
+  game.load.spritesheet('santa', 'resources/img/Santa2.png', 102, 120, 5);
 };
 
 var registerCollionGroups = function(_santaCollionGroup, _chimneyCollisionGroup) {
@@ -29,6 +29,8 @@ var registerContactCallback = function(_contactCallback) {
 var create = function(inputLayer) {
   layer = inputLayer;
   santa = layer.create(SANTA_SPAWN_X, SANTA_SPAWN_Y, 'santa');
+  var idle = santa.animations.add('idle');
+  santa.animations.play('idle', 10, true);
   // Do santas gravity
   game.physics.p2.enable(santa);
   santa.body.fixedRotation = true;

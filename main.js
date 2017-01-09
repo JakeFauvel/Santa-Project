@@ -10,14 +10,17 @@ var rooftopLayer = undefined;
 var santaCollionGroup = undefined;
 var chimneyCollisionGroup = undefined;
 var startButton = undefined;
+var scoreText = undefined;
+var SCORE = 0;
+var christmasMessage = undefined;
 
 var SCREEN_WIDTH = 800;
 var SCREEN_HEIGHT = 600;
 
 var BACKGROUND_X = 0;
 var BACKGROUND_Y = 0;
-var START_BTN_X = 312.5;
-var START_BTN_Y = 275;
+var START_BTN_X = 343.5;
+var START_BTN_Y = 400;
 var SOUND_BTN_X = 740;
 var SOUND_BTN_Y = 25;
 var backgroundMusic = undefined;
@@ -34,9 +37,6 @@ var mid_emitter;
 var back_emitter;
 var update_interval = 4 * 60;
 var i = 0;
-var scoreText = undefined;
-
-var SCORE = 0;
 
 var game = new Phaser.Game(SCREEN_WIDTH, SCREEN_HEIGHT, Phaser.AUTO, 'phaser-example', { preload: preload, create: create, update: update });
 
@@ -45,7 +45,7 @@ function preload() {
   game.load.image('background', 'resources/img/Background.png');
   game.load.image('startButton', 'resources/img/Start_Button.png');
   game.load.image('rooftop', 'resources/img/Winter_Roof.png');
-  game.load.image('snowflakes', 'resources/img/Snowflake.png');
+  game.load.image('snowflakes', 'resources/img/Snow_Particle.png');
   game.load.image('snowflakes_large', 'resources/img/Snowflake.png');
   game.load.image('fire', 'resources/img/Fire.png');
   game.load.image('sound_icon', 'resources/img/Sound_Icon.png');
@@ -64,8 +64,11 @@ function create() {
   var santaLayer = game.add.group();
   var interfaceLayer = game.add.group();
   var textStyle = { font: "20px Arial", fill: "#FFF"};
-  scoreText = this.game.add.text(25, 20, "Score:" + SCORE, textStyle);
+  var christmasMessagestyle = { font: "70px Arial", fill: "#FFF"};
+  scoreText = this.game.add.text(25, 20, "SCORE: " + SCORE, textStyle);
   scoreText.fixedToCamera = true;
+  christmasText = this.game.add.text(50, 225, "MERRY CHRISTMAS!", christmasMessagestyle);
+  christmasText.fixedToCamera = true;
 
   // CREATE MESSAGE TEXT AND HIDE IT
 
@@ -171,7 +174,7 @@ function update() {
   
   if (!GameState.getStopped()) {
     SCORE = SCORE + 1;
-    scoreText.text = "Score: " + SCORE;
+    scoreText.text = "SCORE: " + SCORE;
   }
 
   Chimney.update();
@@ -215,9 +218,9 @@ function audioButton() {
 
 function particleBurst(pointer) {
 
-  //  Position the emitter where the mouse/touch event was
+  //  Position the emitter at Santa's butt
   jetpack_emitter.x = Santa.getSantaX() - 35 ;
-  jetpack_emitter.y = Santa.getSantaY() + 25;
+  jetpack_emitter.y = Santa.getSantaY() + 35;
 
   //  The first parameter sets the effect to "explode" which means all particles are emitted at once
   //  The second gives each particle a 2000ms lifespan
