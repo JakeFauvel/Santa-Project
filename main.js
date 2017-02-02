@@ -13,6 +13,7 @@ var startButton = undefined;
 var scoreText = undefined;
 var SCORE = 0;
 var christmasMessage = undefined;
+var scoreMessage = undefined;
 
 var SCREEN_WIDTH = 800;
 var SCREEN_HEIGHT = 600;
@@ -72,12 +73,12 @@ function create() {
   var interfaceLayer = game.add.group();
   var textStyle = { font: "20px Arial", fill: "#FFF"};
   var christmasMessagestyle = { font: "70px Arial", fill: "#FFF"};
+  var scoreMessagestyle = { font: "40px Arial", fill: "#FFF"};
   scoreText = this.game.add.text(25, 20, "SCORE: " + SCORE, textStyle);
   scoreText.fixedToCamera = true;
   christmasMessage = this.game.add.text(50, 225, "MERRY CHRISTMAS!", christmasMessagestyle);
   christmasMessage.fixedToCamera = true;
-
-  // CREATE MESSAGE TEXT AND HIDE IT
+  scoreMessage = this.game.add.text(250, 320, "Your Score: " + SCORE, scoreMessagestyle);
 
   backgroundLayer.create(BACKGROUND_X, BACKGROUND_Y, 'background');
   startButton = game.add.button(START_BTN_X, START_BTN_Y, 'startButton', startNewGame, interfaceLayer);
@@ -190,13 +191,16 @@ function update() {
   }
   
   if (!GameState.getStopped()) {
+    scoreText.visible = true;
     SCORE = SCORE + 1;
     scoreText.text = "SCORE: " + SCORE;
+    scoreMessage.text = "Your Score: " + SCORE;
+  } else {
+    scoreText.visible = false;
   }
 
   Chimney.update();
   Santa.update(game);
-
 };
 
 function reset() {
@@ -212,11 +216,14 @@ function reset() {
   Santa.reset();
   Chimney.reset();
   startButton.visible = true;
+  scoreMessage.visible = false;
   
   if (SCORE > 0 ) {
     christmasMessage.visible = true;
+    scoreMessage.visible = true;
   } else {
     christmasMessage.visible = false;
+    scoreMessage.visible = false;
   }
 };
 
@@ -225,6 +232,7 @@ function startNewGame() {
   GameState.setStopped(false);
   Santa.show();
   christmasMessage.visible = false;
+  scoreMessage.visible = false;
   startButton.visible = false;
   SCORE = 0;
 };
@@ -252,5 +260,4 @@ function santaEffects(pointer) {
       var randomArrayIndex = Math.floor(Math.random() * thrustArray.length);
       thrustArray[randomArrayIndex].play();
   }
-
 }
